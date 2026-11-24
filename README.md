@@ -12,6 +12,10 @@ Huda runs a small home catering business in Dubai. A client sends an incomplete 
 
 [WORKFLOW.md](WORKFLOW.md) describes the system once, without tools: the people, the steps, the data, the five stages and the five test cases. Every version follows it and uses the same step names, so you can put any two side by side.
 
+## Teaching it
+
+[guides/](guides) has a teaching path for facilitators and one step-by-step guide per version: [coded](guides/1-coded.md), [n8n](guides/2-n8n.md) and [Lovable](guides/3-lovable.md).
+
 ## The three versions
 
 | Folder | Who it's for | What it is | Checked |
