@@ -61,7 +61,7 @@ export function mockReading(business, transcript, alreadyAsked, today = new Date
     occasion: (client.match(/birthday|wedding|office|party|graduation|عيد ميلاد/i) || [""])[0].toLowerCase(),
     missing: ask ? ["number of guests"] : [],
     clarifying_question: ask ? (ar ? "كم عدد الضيوف المتوقع؟" : "How many guests are you expecting?") : "",
-    summary: ar ? `طلب: ${items.map(i => business.services.find(s => s.id === i.service_id).name_ar).join("، ")}.` : `You asked for: ${items.map(i => business.services.find(s => s.id === i.service_id).name.toLowerCase()).join(", ")}${guests ? ` for ${guests} guests` : ""}.`,
+    summary: !items.length ? (ar ? "طلب خارج القائمة." : "A request for something not on the menu.") : ar ? `طلب: ${items.map(i => business.services.find(s => s.id === i.service_id).name_ar).join("، ")}.` : `You asked for: ${items.map(i => business.services.find(s => s.id === i.service_id).name.toLowerCase()).join(", ")}${guests ? ` for ${guests} guests` : ""}.`,
     holding_message: out || !items.length ? (ar ? "شكراً لرسالتك! ستتواصل معك هدى شخصياً قريباً." : `Thanks for your message! ${name} will reply to you personally soon.`) : "",
   };
 }

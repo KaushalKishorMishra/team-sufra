@@ -9,3 +9,4 @@ n8n/.tools/
 
 # Account-specific: database ids, caterer login codes
 coded/deploy/
+n8n/.local/

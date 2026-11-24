@@ -14,6 +14,7 @@ A client writes in a chat. The model **reads** the enquiry. n8n **decides** what
 | `1-stage-0-prototype.json` | Stage 0: the prototype. Prices are typed into the code, nobody approves, and the reply goes straight to the client. |
 | `2-quote-agent-stages-1-to-3.json` | The full agent: stages 1, 2 and 3 in one workflow, with notes on the canvas that explain each box. |
 | `price_list.csv` | Huda's menu, if you'd rather make the tables by hand. |
+| `SCREENSHOTS.md` | The build in screenshots: set-up, the agent, and the five test cases run end to end. |
 
 Tested on n8n version 2.48.8.
 

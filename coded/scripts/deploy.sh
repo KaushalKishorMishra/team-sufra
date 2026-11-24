@@ -39,12 +39,14 @@ fi
 # 3. For each stage: the project, its secrets, the deploy
 for n in 0 1 2 3 4; do
   name="team-sufra-stage-$n"
-  $W pages project create "$name" --production-branch main >/dev/null 2>&1 || true
-  if [ ! -f "deploy/.secrets-$n" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-    tr -d '\n' < deploy/logins.txt | $W pages secret put CATERER_LOGINS --project-name "$name" >/dev/null
+  cd "build/stage-$n"   # this stage's own settings, with its real database id
+  $W pages project list | grep -q "$name" || $W pages project create "$name" --production-branch main --force >/dev/null   # --force: classic Pages, not Workers
+  if [ ! -f "../../deploy/.secrets-$n" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+    tr -d '\n' < ../../deploy/logins.txt | $W pages secret put CATERER_LOGINS --project-name "$name" >/dev/null
     [ -n "${ANTHROPIC_API_KEY:-}" ] && printf %s "$ANTHROPIC_API_KEY" | $W pages secret put ANTHROPIC_API_KEY --project-name "$name" >/dev/null
-    touch "deploy/.secrets-$n"
+    touch "../../deploy/.secrets-$n"
   fi
-  (cd "build/stage-$n" && $W pages deploy --project-name "$name" --branch main --commit-dirty=true)
+  $W pages deploy --project-name "$name" --branch main --commit-dirty=true
+  cd ../..
   echo "Stage $n: https://$name.pages.dev"
 done

@@ -1078,7 +1078,7 @@
     {
       "parameters": {
         "operation": "send",
-        "message": "={{ $json.client_message }}",
+        "message": "={{ ($json.client_message || \"\").replace(/([^\\n])\\n(?!\\n)/g, \"$1  \\n\") }}",
         "options": {}
       },
       "id": "84ac148e-0f14-4722-a82b-027ad063441c",
