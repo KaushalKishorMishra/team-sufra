@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Sufra's quote agent</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+  .intro { max-width: 860px; }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 10px 0 0; }
+  .steps li { counter-increment: s; padding: 8px 0 8px 40px; position: relative; border-bottom: 1px solid var(--line); }
+  .steps li::before { content: counter(s); position: absolute; left: 0; top: 8px; width: 26px; height: 26px; border-radius: 50%; background: var(--indigo); color: #fff; display: grid; place-items: center; font-size: 12.5px; font-weight: 700; }
+  .added { margin-top: 18px; }
+  .added li { margin: 4px 0; }
+  .go { display: flex; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+  .go a { text-decoration: none; }
+</style>
+</head>
+<body>
+<main class="wrap intro"><div id="main"></div></main>
+<script src="common.js"></script>
+<script>
+// What this stage adds, and what to show, in the words of the session
+const ADDED = [
+  { q: "This is where we start: a working prototype.", add: ["A chat page, the agent and an inbox. Nothing else."],
+    show: ["Send an enquiry; it works once.", "Click \"Restart the program\" in the inbox: the inbox is empty.", "The prices are in a file inside the program: change one and nothing changes until someone redeploys.", "Open the inbox in a private window: anyone gets in."] },
+  { q: "How do users reach it, and where does the person act?", add: ["The client's messages stay together as one conversation.", "Huda logs in; the inbox is only visible after login."],
+    show: ["Write from a phone as the client.", "Log in as Huda on a laptop, see the enquiry, approve it: the price appears in the client's chat only now.", "Try a wrong login: it is refused."] },
+  { q: "Where does the truth live, and what must it remember?", add: ["The price list moves into a database, with a page where Huda edits it.", "Enquiries, drafts, approvals and the conversation are stored."],
+    show: ["Change a price on the price list page; the next quote uses it, with no redeploy.", "Click \"Restart the program\": everything is still there.", "A quote already waiting shows both the price it was drafted at and today's, and Huda chooses."] },
+  { q: "Where does it run, why would a customer trust it, and what does a conversation cost?", add: ["Phone numbers and emails hidden before the model reads a message.", "A polite reply when the model fails, with the enquiry handed to Huda.", "A daily limit, a cost page, and deletion 30 days after the last message.", "The API key kept as a secret on the server, never in the code."],
+    show: ["Send the sample with a phone number; in the inbox, \"What the model read\" shows [phone].", "Switch the model off on the Safety and cost page, then write as the client: a polite reply, and a note for Huda.", "Set the daily limit to today's number: the next client is told politely.", "Read the cost per enquiry."] },
+  { q: "What changes with many users?", add: ["Several caterers, each with their own login, price list and enquiries.", "A log the team can read."],
+    show: ["Log in as two caterers in two windows: each sees only their own enquiries and prices.", "Open the log: one enquiry from arrival to approval."] },
+];
+frame("Start here").then(st => {
+  const a = ADDED[st.stage];
+  $("#main").innerHTML = `<h1>Team Sufra's quote agent</h1>
+  <p class="lead">A client sends an incomplete enquiry. The agent reads it, asks one question if a detail is missing, and drafts a summary and a quote from Huda's own price list. Huda approves, edits or rejects it. Nothing reaches the client before she approves. The model reads the words; the code sets the price.</p>
+  <div class="go"><a class="btn amber" href="chat.html">Open the client chat</a><a class="btn ghost" href="inbox.html">Open the caterer inbox</a></div>
+  <div class="card"><h2 style="margin-top:0">${esc(st.name)}</h2><p><b>${esc(a.q)}</b></p>
+    <h3 class="added">What this stage adds</h3><ul>${a.add.map(x => `<li>${esc(x)}</li>`).join("")}</ul>
+    <h3 class="added">What to show</h3><ol class="steps">${a.show.map(x => `<li>${esc(x)}</li>`).join("")}</ol></div>`;
+});
+</script>
+</body>
+</html>

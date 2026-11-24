@@ -1,0 +1,9 @@
+service_id,name,name_ar,price,unit,includes
+classic_buffet,Classic buffet,بوفيه كلاسيكي,85,guest,"Two mains, rice, three salads, bread and one dessert"
+premium_buffet,Premium buffet,بوفيه مميز,140,guest,"Four mains with a live grill station, rice, five salads, bread and two desserts"
+canape_platters,Canapé platters,أطباق المقبلات,45,guest,"Eight bites per guest, hot and cold, for receptions and standing events"
+kids_menu,Kids' menu,قائمة الأطفال,35,child,"Mini burgers, chicken bites, fruit cups and a juice box"
+drinks,Soft drinks and juices,مشروبات غازية وعصائر,15,guest,"Water, soft drinks and two fresh juices, served for four hours"
+celebration_cake,Celebration cake,كعكة الاحتفال,320,cake,"Serves 30, one flavor, a name or message on top"
+service_staff,Service staff,طاقم الخدمة,220,person,"One server for four hours: setting up, serving and clearing"
+delivery_setup,Delivery and setup,التوصيل والتجهيز,150,event,"Delivery anywhere in Dubai, chafing dishes and table setup"

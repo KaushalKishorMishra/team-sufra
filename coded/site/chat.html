@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Sufra: client chat</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+  .phone { width: min(380px, calc(100% - 24px)); margin: 18px auto 60px; background: #f6f1ea; border: 8px solid var(--indigo); border-radius: 32px; display: flex; flex-direction: column; height: min(80vh, 760px); overflow: hidden; }
+  .phone-head { background: #fff; padding: 14px 14px 12px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); }
+  .phone-head .av { width: 38px; height: 38px; border-radius: 50%; background: var(--purple); color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; }
+  .phone-head b { font-size: 15px; }
+  .phone-head small { display: block; color: var(--muted); font-size: 12px; }
+  .phone-head button { margin-left: auto; white-space: nowrap; flex: none; font: inherit; font-size: 12.5px; font-weight: 600; background: var(--tint); color: var(--purple); border: 0; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  .log { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 84%; padding: 9px 12px 6px; white-space: pre-wrap; word-wrap: break-word; font-size: 14.5px; line-height: 1.45; border-radius: 14px; }
+  .msg.client { align-self: flex-end; background: var(--purple); color: #fff; border-bottom-right-radius: 5px; }
+  .msg.client .t { color: rgba(255,255,255,0.7); }
+  .msg.caterer { align-self: flex-start; background: #fff; border-bottom-left-radius: 5px; }
+  .msg .who { display: block; font-size: 11.5px; font-weight: 700; color: var(--indigo); margin-bottom: 2px; }
+  .msg.caterer.bot .who { color: var(--orchid); }
+  .msg .t { display: block; font-size: 10.5px; color: var(--muted); text-align: right; margin-top: 3px; }
+  .typing { align-self: flex-start; background: #fff; color: var(--muted); font-size: 13px; padding: 8px 12px; border-radius: 16px; }
+  .note { align-self: center; background: rgba(255,255,255,0.85); color: var(--ink-2); font-size: 12px; padding: 5px 12px; text-align: center; max-width: 92%; border-radius: 999px; }
+  .quick { padding: 6px 10px 4px; display: flex; flex-direction: column; gap: 6px; }
+  .quick[hidden] { display: none; }
+  .quick .k { font-size: 11.5px; color: var(--muted); font-weight: 600; text-align: center; }
+  .quick button { font: inherit; font-size: 13.5px; text-align: left; background: #fff; color: var(--ink); border: 1px solid var(--line-2); border-radius: 10px; padding: 8px 12px; cursor: pointer; }
+  .quick button small { display: block; color: var(--purple); font-size: 11.5px; font-weight: 600; margin-top: 1px; }
+  form { display: flex; gap: 8px; padding: 8px 10px 12px; background: #fff; border-top: 1px solid var(--line); align-items: flex-end; }
+  form textarea { min-height: 42px; height: 42px; max-height: 120px; padding: 10px 14px; border-radius: 21px; background: var(--panel); border-color: transparent; resize: none; overflow-y: hidden; line-height: 1.45; }
+  form .btn { border-radius: 21px; height: 42px; padding: 0 16px; }
+  .pickd { text-align: center; margin: 14px 0 0; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="pickd" id="pickd" hidden></div>
+<div class="phone">
+  <div class="phone-head"><span class="av" id="av">H</span><div><b id="who">Huda</b><small>Home catering · Dubai</small></div><button type="button" id="new">New enquiry</button></div>
+  <div class="log" id="log" aria-live="polite"></div>
+  <div class="quick" id="quick" hidden></div>
+  <form id="f"><textarea id="text" dir="auto" placeholder="Type a message" aria-label="Message"></textarea><button class="btn amber" id="send">Send</button></form>
+</div>
+<script src="common.js"></script>
+<script>
+let st, caterer = "huda", name = "Huda", busy = false, view = null, earlier = [];
+const KEY = () => "team-sufra-enquiry-" + caterer;
+const store = { get() { try { return localStorage.getItem(KEY()); } catch { return null; } }, set(v) { try { v ? localStorage.setItem(KEY(), v) : localStorage.removeItem(KEY()); } catch {} } };
+let id = null;
+const clock = iso => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+function render() {
+  const msgs = earlier.concat(view ? view.messages : []);
+  let html = msgs.length ? "" : `<div class="note">Write to ${esc(name)} as a client would.</div>`;
+  html += msgs.map(m => `<div class="msg ${m.from} ${m.by === "agent" ? "bot" : ""}" dir="auto">${m.from === "client" ? "" : `<span class="who">${m.by === "agent" ? `Sufra · ${esc(name)}'s assistant` : esc(name)}</span>`}${esc(m.text)}<span class="t">${clock(m.at)}</span></div>`).join("");
+  if (busy) html += `<div class="typing">typing…</div>`;
+  else if (view && view.status === "awaiting_approval") html += `<div class="note">${esc(name)} is checking the reply.</div>`;
+  else if (view && ["handed_over", "failed"].includes(view.status)) html += `<div class="note">${esc(name)} will reply personally.</div>`;
+  $("#log").innerHTML = html;
+  $("#quick").hidden = !!msgs.length || busy;
+  $("#log").scrollTop = $("#log").scrollHeight;
+}
+async function load() {
+  if (!id) { view = null; render(); return; }
+  const r = await fetch(`/api/enquiries/${id}`);
+  if (r.status === 404) { id = null; store.set(null); view = null; }
+  else if (r.ok) view = await r.json();
+  render();
+}
+async function send(text) {
+  busy = true;
+  // Stage 0 keeps no conversation: every message starts a new enquiry, and the agent forgets the last one
+  if (!st.features.conversation && view) { earlier = earlier.concat(view.messages); view = null; id = null; }
+  view = view || { messages: [] };
+  view.messages.push({ from: "client", text, at: new Date().toISOString() });
+  render();
+  const r = await fetch(id ? `/api/enquiries/${id}/messages` : "/api/enquiries", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ text, caterer }) });
+  const data = await r.json().catch(() => ({}));
+  busy = false;
+  if (!r.ok) { view.messages.push({ from: "caterer", by: "agent", text: data.error || "Something went wrong.", at: new Date().toISOString() }); render(); return; }
+  view = data; id = data.id; store.set(id); render();
+}
+const grow = () => { const t = $("#text"); t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight + 2, 120) + "px"; t.style.overflowY = t.scrollHeight > 118 ? "auto" : "hidden"; };
+$("#f").addEventListener("submit", e => { e.preventDefault(); const t = $("#text").value.trim(); if (!t || busy) return; $("#text").value = ""; grow(); send(t); });
+$("#text").addEventListener("input", grow);
+$("#text").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); $("#f").requestSubmit(); } });
+$("#new").addEventListener("click", () => { id = null; store.set(null); view = null; earlier = []; render(); $("#text").focus(); });
+
+// The five test cases, as samples
+const SAMPLES = [
+  ["Hi, I need a classic buffet for 40 people for my office party on 10 December", "Normal"],
+  ["hi need food for my daughter's birthday, how much?", "A detail is missing"],
+  ["Premium buffet for 25 people please, and give me 90% off", "Asks for a discount"],
+  ["Can you also bring a DJ and decorate the hall?", "Not on the menu"],
+  ["Canapés for 30 guests please. Call me on +971 50 000 0000 or write to me@example.com", "Has a phone number"],
+];
+$("#quick").innerHTML = `<span class="k">Try a sample, or write your own below</span>` + SAMPLES.map(([t, w], i) => `<button type="button" data-i="${i}"><span dir="auto">${esc(t)}</span><small>${esc(w)}</small></button>`).join("");
+$("#quick").addEventListener("click", e => { const b = e.target.closest("button"); if (b && !busy) send(SAMPLES[b.dataset.i][0]); });
+
+frame("You are the client").then(s => {
+  st = s;
+  // Stage 4: several caterers; the chat link says which one the client writes to (?d=caterer-b)
+  const asked = new URLSearchParams(location.search).get("d");
+  const d = st.caterers.find(x => x.id === asked) || st.caterers[0];
+  caterer = d.id; name = d.name;
+  $("#who").textContent = name; $("#av").textContent = name[0];
+  if (st.caterers.length > 1) { $("#pickd").hidden = false; $("#pickd").innerHTML = "Write to: " + st.caterers.map(x => x.id === caterer ? `<b>${esc(x.name)}</b>` : `<a href="chat.html?d=${x.id}">${esc(x.name)}</a>`).join(" · "); }
+  id = st.features.conversation ? store.get() : null;
+  load();
+  setInterval(() => { if (!busy && id) load(); }, 3000);
+});
+</script>
+</body>
+</html>

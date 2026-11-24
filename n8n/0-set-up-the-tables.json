@@ -1,0 +1,351 @@
+{
+  "name": "Set up the tables",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# Set up the tables (run once)\nClick **Execute workflow**. It creates four Data tables in this project and fills in Huda's menu:\n- **price_list**: service_id, name, name_ar, price (AED), unit, includes. Huda edits prices here (Overview, Data tables).\n- **enquiries**: one row per client conversation: status, summary, draft, quote, total, approval link, note.\n- **messages**: the conversation, one row per message.\n- **log**: one row per step.\n\nRunning it again is safe: existing tables are reused, and the menu is reset to the prices below.\n\n*Team Sufra, its users and every figure are fictional.*",
+        "height": 340,
+        "width": 1500,
+        "color": 7
+      },
+      "id": "059e2575-3de3-4e9b-a3cb-8ea6f11beb6f",
+      "name": "Note: setup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -380
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "85db8d8e-a8e7-4d95-ae99-8417968f6caf",
+      "name": "Run once",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "price_list",
+        "columns": {
+          "column": [
+            {
+              "name": "service_id",
+              "type": "string"
+            },
+            {
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "name": "name_ar",
+              "type": "string"
+            },
+            {
+              "name": "price",
+              "type": "number"
+            },
+            {
+              "name": "unit",
+              "type": "string"
+            },
+            {
+              "name": "includes",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "6ed34e91-3c79-40c4-a916-01ce64048778",
+      "name": "Create price_list",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        120,
+        100
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "enquiries",
+        "columns": {
+          "column": [
+            {
+              "name": "session_id",
+              "type": "string"
+            },
+            {
+              "name": "caterer",
+              "type": "string"
+            },
+            {
+              "name": "status",
+              "type": "string"
+            },
+            {
+              "name": "summary",
+              "type": "string"
+            },
+            {
+              "name": "draft",
+              "type": "string"
+            },
+            {
+              "name": "quote",
+              "type": "string"
+            },
+            {
+              "name": "total",
+              "type": "number"
+            },
+            {
+              "name": "approval_link",
+              "type": "string"
+            },
+            {
+              "name": "note",
+              "type": "string"
+            },
+            {
+              "name": "asked_question",
+              "type": "boolean"
+            },
+            {
+              "name": "day",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "f8c69b67-8ed4-40bd-a5c9-6fa5d065a811",
+      "name": "Create enquiries",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        100
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "messages",
+        "columns": {
+          "column": [
+            {
+              "name": "session_id",
+              "type": "string"
+            },
+            {
+              "name": "sender",
+              "type": "string"
+            },
+            {
+              "name": "text",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "9b8b396d-cd92-4d22-af92-3927288d5ec1",
+      "name": "Create messages",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        100
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "log",
+        "columns": {
+          "column": [
+            {
+              "name": "session_id",
+              "type": "string"
+            },
+            {
+              "name": "step",
+              "type": "string"
+            },
+            {
+              "name": "detail",
+              "type": "string"
+            },
+            {
+              "name": "status",
+              "type": "string"
+            },
+            {
+              "name": "day",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "5ccd0ca7-9398-4a3d-ab8d-b18cd5a05466",
+      "name": "Create log",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        100
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Huda's menu, in AED. The unit says what each price is per: guest, child, cake, person or event.\nreturn [\n  {\n    \"service_id\": \"classic_buffet\",\n    \"name\": \"Classic buffet\",\n    \"name_ar\": \"بوفيه كلاسيكي\",\n    \"price\": 85,\n    \"unit\": \"guest\",\n    \"includes\": \"Two mains, rice, three salads, bread and one dessert\"\n  },\n  {\n    \"service_id\": \"premium_buffet\",\n    \"name\": \"Premium buffet\",\n    \"name_ar\": \"بوفيه مميز\",\n    \"price\": 140,\n    \"unit\": \"guest\",\n    \"includes\": \"Four mains with a live grill station, rice, five salads, bread and two desserts\"\n  },\n  {\n    \"service_id\": \"canape_platters\",\n    \"name\": \"Canapé platters\",\n    \"name_ar\": \"أطباق المقبلات\",\n    \"price\": 45,\n    \"unit\": \"guest\",\n    \"includes\": \"Eight bites per guest, hot and cold, for receptions and standing events\"\n  },\n  {\n    \"service_id\": \"kids_menu\",\n    \"name\": \"Kids' menu\",\n    \"name_ar\": \"قائمة الأطفال\",\n    \"price\": 35,\n    \"unit\": \"child\",\n    \"includes\": \"Mini burgers, chicken bites, fruit cups and a juice box\"\n  },\n  {\n    \"service_id\": \"drinks\",\n    \"name\": \"Soft drinks and juices\",\n    \"name_ar\": \"مشروبات غازية وعصائر\",\n    \"price\": 15,\n    \"unit\": \"guest\",\n    \"includes\": \"Water, soft drinks and two fresh juices, served for four hours\"\n  },\n  {\n    \"service_id\": \"celebration_cake\",\n    \"name\": \"Celebration cake\",\n    \"name_ar\": \"كعكة الاحتفال\",\n    \"price\": 320,\n    \"unit\": \"cake\",\n    \"includes\": \"Serves 30, one flavor, a name or message on top\"\n  },\n  {\n    \"service_id\": \"service_staff\",\n    \"name\": \"Service staff\",\n    \"name_ar\": \"طاقم الخدمة\",\n    \"price\": 220,\n    \"unit\": \"person\",\n    \"includes\": \"One server for four hours: setting up, serving and clearing\"\n  },\n  {\n    \"service_id\": \"delivery_setup\",\n    \"name\": \"Delivery and setup\",\n    \"name_ar\": \"التوصيل والتجهيز\",\n    \"price\": 150,\n    \"unit\": \"event\",\n    \"includes\": \"Delivery anywhere in Dubai, chafing dishes and table setup\"\n  }\n].map(row => ({ json: row }));"
+      },
+      "id": "174bbdd7-f187-46ad-ac96-619154f1f26b",
+      "name": "Huda's price list",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1000,
+        100
+      ],
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "row",
+        "operation": "upsert",
+        "dataTableId": {
+          "__rl": true,
+          "mode": "name",
+          "value": "price_list"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "service_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.service_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "3a79123b-7521-473f-a346-d74432007711",
+      "name": "Save the price list",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1220,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Run once": {
+      "main": [
+        [
+          {
+            "node": "Create price_list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create price_list": {
+      "main": [
+        [
+          {
+            "node": "Create enquiries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create enquiries": {
+      "main": [
+        [
+          {
+            "node": "Create messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create messages": {
+      "main": [
+        [
+          {
+            "node": "Create log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create log": {
+      "main": [
+        [
+          {
+            "node": "Huda's price list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Huda's price list": {
+      "main": [
+        [
+          {
+            "node": "Save the price list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "meta": {},
+  "tags": []
+}

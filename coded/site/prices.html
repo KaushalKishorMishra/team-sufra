@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Sufra: price list</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+  .prices { max-width: 720px; }
+  .prices input { width: 120px; text-align: right; }
+</style>
+</head>
+<body>
+<main class="wrap prices"><div id="main"></div></main>
+<script src="common.js"></script>
+<script>
+let st;
+function render(data, said) {
+  $("#main").innerHTML = `<h1>${esc(data.caterer)}'s price list</h1>
+    <p class="lead">The agent reads this list every time it drafts a quote. Change a price and save: the next quote uses it, with no redeploy. A quote already waiting shows both prices, and ${esc(data.caterer)} chooses.</p>
+    <form id="p" class="card"><table><tr><th>Service</th><th>What is included</th><th>Per</th><th class="num">Price (${esc(data.currency)})</th></tr>
+    ${data.services.map(s => `<tr><td>${esc(s.name)}</td><td class="muted">${esc(s.includes || "")}</td><td>${esc(s.unit)}</td><td class="num"><input type="text" inputmode="numeric" data-id="${esc(s.id)}" value="${s.price}" aria-label="${esc(s.name)} price"></td></tr>`).join("")}
+    </table><div class="actions" style="display:flex;gap:10px;align-items:center;margin-top:14px"><button class="btn amber">Save prices</button><span class="${said && said.err ? "err" : "muted"}">${esc(said ? said.text : "")}</span></div></form>`;
+  $("#p").addEventListener("submit", async e => {
+    e.preventDefault();
+    const services = [...document.querySelectorAll("[data-id]")].map(i => ({ id: i.dataset.id, price: i.value.replace(/[^\d.]/g, "") }));
+    const r = await api("/api/prices", { services });
+    const d = await r.json();
+    r.ok ? render(d, { text: "Saved. The next quote uses these prices." }) : render(data, { text: d.error, err: true });
+  });
+}
+frame("The caterer's price list").then(async s => {
+  st = s;
+  if (!st.features.priceTable) { $("#main").innerHTML = `<p class="lead">Until stage 2 the prices are in a file inside the program. Changing one needs a redeploy.</p>`; return; }
+  const data = await catererGet("/api/prices", $("#main"), st);
+  if (data && data.services) render(data);
+});
+</script>
+</body>
+</html>

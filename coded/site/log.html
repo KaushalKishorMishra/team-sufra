@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Sufra: log</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+  .enq { margin: 0 0 14px; max-width: 900px; }
+  .enq ol { list-style: none; margin: 8px 0 0; padding: 0; }
+  .enq li { display: grid; grid-template-columns: 70px 110px 1fr; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .enq li:last-child { border-bottom: 0; }
+  .enq .s { font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--purple); padding-top: 2px; }
+  @media (max-width: 600px) { .enq li { grid-template-columns: 60px 1fr; } .enq li span:last-child { grid-column: 1 / -1; } }
+</style>
+</head>
+<body>
+<main class="wrap"><div id="main"></div></main>
+<script src="common.js"></script>
+<script>
+// One line per step, in words a non-engineer can read
+const SAY = {
+  receive: d => `The client wrote: "${d.text}"`,
+  read: d => d.masked ? `The model read the message with personal details hidden: "${d.model_read}"` : `The model read the message.`,
+  greet: () => `The agent answered small talk.`,
+  ask: d => `The agent asked one question: "${d.question}"`,
+  handover: d => `Handed to the caterer: ${d.reason}`,
+  draft: d => `Quote drafted from the price list: ${money(d.total, d.currency)}. Waiting for approval.`,
+  approve: d => `The caterer approved${d.total ? ` and sent ${money(d.total)}` : ""}${d.price === "current" ? " at today's price" : ""}.`,
+  edit: () => `The caterer edited the message and sent it.`,
+  reject: () => `The caterer rejected the draft. Nothing was sent.`,
+  reply: () => `The caterer replied to the client personally.`,
+  fail: d => `The model failed. The client got a polite reply. ${d.note}`,
+};
+function render(data) {
+  const by = {};
+  for (const e of data.events.slice().reverse()) (by[e.enquiry_id] = by[e.enquiry_id] || []).push(e);
+  const ids = Object.keys(by).reverse();
+  $("#main").innerHTML = `<h1>${esc(data.caterer)}'s log</h1><p class="lead">Every step writes one line, so the team can follow any enquiry from arrival to approval.</p>` +
+    (ids.length ? ids.map(id => `<div class="card enq"><b>Enquiry ${esc(id.slice(0, 6))}</b><ol>${by[id].map(e => `<li><span class="muted">${new Date(e.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</span><span class="s">${esc(e.step)}</span><span dir="auto">${esc((SAY[e.step] || (() => e.step))(e.detail))}</span></li>`).join("")}</ol></div>`).join("") : `<p class="muted">Nothing yet.</p>`);
+}
+frame("The team's log").then(async st => {
+  if (!st.features.log) { $("#main").innerHTML = `<p class="lead">The log page arrives in stage 4.</p>`; return; }
+  const data = await catererGet("/api/log", $("#main"), st);
+  if (data && data.events) render(data);
+});
+</script>
+</body>
+</html>

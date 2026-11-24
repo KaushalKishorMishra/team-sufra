@@ -1,0 +1,37 @@
+{
+  "_note": "Team Sufra, its users and every figure are fictional. Huda's own menu, price list and booking calendar: the agent prices only from this file, never from the model. Prices are per guest unless the unit says otherwise.",
+  "caterer": {
+    "name": "Huda",
+    "business": "Huda's Kitchen, home catering",
+    "city": "Dubai",
+    "currency": "AED"
+  },
+  "services": [
+    { "id": "classic_buffet", "name": "Classic buffet", "name_ar": "بوفيه كلاسيكي", "price": 85, "unit": "guest", "includes": "Two mains, rice, three salads, bread and one dessert" },
+    { "id": "premium_buffet", "name": "Premium buffet", "name_ar": "بوفيه مميز", "price": 140, "unit": "guest", "includes": "Four mains with a live grill station, rice, five salads, bread and two desserts" },
+    { "id": "canape_platters", "name": "Canapé platters", "name_ar": "أطباق المقبلات", "price": 45, "unit": "guest", "includes": "Eight bites per guest, hot and cold, for receptions and standing events" },
+    { "id": "kids_menu", "name": "Kids' menu", "name_ar": "قائمة الأطفال", "price": 35, "unit": "child", "includes": "Mini burgers, chicken bites, fruit cups and a juice box" },
+    { "id": "drinks", "name": "Soft drinks and juices", "name_ar": "مشروبات غازية وعصائر", "price": 15, "unit": "guest", "includes": "Water, soft drinks and two fresh juices, served for four hours" },
+    { "id": "celebration_cake", "name": "Celebration cake", "name_ar": "كعكة الاحتفال", "price": 320, "unit": "cake", "includes": "Serves 30, one flavor, a name or message on top" },
+    { "id": "service_staff", "name": "Service staff", "name_ar": "طاقم الخدمة", "price": 220, "unit": "person", "includes": "One server for four hours: setting up, serving and clearing" },
+    { "id": "delivery_setup", "name": "Delivery and setup", "name_ar": "التوصيل والتجهيز", "price": 150, "unit": "event", "includes": "Delivery anywhere in Dubai, chafing dishes and table setup" }
+  ],
+  "not_offered": [
+    "Alcohol",
+    "Venue hire, decorations, flowers and entertainment",
+    "Events of more than 200 guests",
+    "Weekly meal plans, office lunch subscriptions or supplying restaurants"
+  ],
+  "rules": {
+    "min_guests": 15,
+    "max_guests": 200,
+    "rush_days": 3,
+    "rush_fee_percent": 25,
+    "quote_valid_days": 7
+  },
+  "calendar": [
+    { "from": "2026-12-02", "to": "2026-12-03", "busy": "UAE National Day holidays" },
+    { "from": "2026-12-12", "to": "2026-12-12", "busy": "Fully booked: a wedding" },
+    { "from": "2026-12-24", "to": "2027-01-02", "busy": "Year-end break" }
+  ]
+}

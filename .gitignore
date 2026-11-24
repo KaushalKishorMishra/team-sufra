@@ -1,0 +1,11 @@
+node_modules/
+.dev.vars
+.wrangler/
+build/
+.DS_Store
+
+# n8n local install (not committed)
+n8n/.tools/
+
+# Account-specific: database ids, caterer login codes
+coded/deploy/

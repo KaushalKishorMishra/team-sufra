@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Sufra: safety and cost</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="style.css">
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; max-width: 1100px; }
+  .big { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+  .row input { width: 110px; }
+  .on { color: var(--good); font-weight: 700; } .off { color: var(--bad); font-weight: 700; }
+</style>
+</head>
+<body>
+<main class="wrap"><div id="main"></div></main>
+<script src="common.js"></script>
+<script>
+let st;
+const usd = n => "USD " + Number(n || 0).toFixed(6).replace(/0+$/, "").replace(/\.$/, ".0");
+function render(s, u) {
+  $("#main").innerHTML = `<h1>Safety and cost</h1>
+  <p class="lead">What keeps a real system safe to run, and what each conversation costs. The API key is kept as a secret on the server, never in the code.</p>
+  <div class="grid">
+    <div class="card"><h3>The model</h3><p>The model is <span class="${s.model_on ? "on" : "off"}">${s.model_on ? "on" : "switched off"}</span>.</p>
+      <p class="muted" style="font-size:14px">Switch it off to see what happens when the model fails: the client gets a polite reply, and the enquiry comes to you with a note.</p>
+      <div class="row"><button class="btn ${s.model_on ? "danger" : "amber"}" id="toggle">${s.model_on ? "Switch the model off" : "Switch the model back on"}</button></div></div>
+    <div class="card"><h3>Daily limit</h3><p><span class="big">${s.today}</span> of ${s.daily_limit} new enquiries today.</p>
+      <p class="muted" style="font-size:14px">At the limit the agent stops taking new enquiries and says so politely. To see it, set the limit to today's number.</p>
+      <div class="row"><input type="text" inputmode="numeric" id="limit" value="${s.daily_limit}" aria-label="Daily limit"><button class="btn ghost" id="setlimit">Set limit</button><button class="btn ghost" id="atnow">Set to today's number</button></div></div>
+    <div class="card"><h3>Cost per enquiry</h3><p><span class="big">${usd(u.avg_cost_usd)}</span></p>
+      <table><tr><td>Enquiries</td><td class="num">${u.enquiries || 0}</td></tr><tr><td>Model calls, total</td><td class="num">${usd(u.cost_usd)}</td></tr>
+      <tr><td>Tokens read / written</td><td class="num">${(u.tokens_in || 0).toLocaleString("en-US")} / ${(u.tokens_out || 0).toLocaleString("en-US")}</td></tr><tr><td>Model</td><td class="num">${esc(u.model)}</td></tr></table>
+      <p class="muted" style="font-size:13px;margin:10px 0 0">Measured from real usage. The smallest model, Claude Haiku, costs a fraction of a cent per enquiry. Hosting and ${esc(u.caterer)}'s checking time come on top.</p></div>
+    <div class="card"><h3>Personal details</h3><p style="font-size:14px">Phone numbers and emails are hidden before the model reads a message; you still see the original. Open any enquiry in the inbox and look under "What the model read".</p>
+      <p style="font-size:14px">Each enquiry is deleted 30 days after its last message.</p></div>
+  </div>`;
+  $("#toggle").onclick = async () => { await api("/api/settings", { model_on: !s.model_on }); load(); };
+  $("#setlimit").onclick = async () => { await api("/api/settings", { daily_limit: $("#limit").value }); load(); };
+  $("#atnow").onclick = async () => { await api("/api/settings", { daily_limit: s.today }); load(); };
+}
+async function load() {
+  const s = await catererGet("/api/settings", $("#main"), st); if (!s || s.error) return;
+  const u = await (await api("/api/usage")).json();
+  render(s, u);
+}
+frame("Safety and cost").then(s => {
+  st = s;
+  if (!st.features.cost) { $("#main").innerHTML = `<p class="lead">This page arrives in stage 3.</p>`; return; }
+  load();
+});
+</script>
+</body>
+</html>
