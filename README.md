@@ -16,9 +16,9 @@ Huda runs a small home catering business in Dubai. A client sends an incomplete 
 
 | Folder | Who it's for | What it is | Checked |
 |---|---|---|---|
-| [coded/](coded) | People who code | A Cloudflare program with a database, online as five stages at their own addresses | All five stages pass on a local server and on the built Pages folders, in mock mode. Not yet online. |
-| [n8n/](n8n) | No-code, automation | Three n8n workflows to import: table setup, stage 0, and stages 1 to 3 in one canvas with notes | Run on a local n8n 2.48.8 with sample model answers: all five test cases pass three runs out of three. |
-| [lovable/](lovable) | No-code, app builder | Prompts to paste into Lovable, stage by stage, with a reference server function and a checklist | Written; being built in Lovable next, with screenshots. |
+| [coded/](coded) | People who code | A Cloudflare program with a database, online as five stages at their own addresses | All five stages pass on a local server and on the built Pages folders, in mock mode. Online at team-sufra-stage-0.pages.dev to team-sufra-stage-4.pages.dev, with sample answers until a key is added. |
+| [n8n/](n8n) | No-code, automation | Three n8n workflows to import: table setup, stage 0, and stages 1 to 3 in one canvas with notes | Run on a local n8n 2.48.8 with sample model answers: all five test cases pass three runs out of three. Screenshots in [n8n/SCREENSHOTS.md](n8n/SCREENSHOTS.md). |
+| [lovable/](lovable) | No-code, app builder | Prompts to paste into Lovable, stage by stage, with a reference server function and a checklist | Being built in Lovable: stage 0 is half done. Progress and screenshots in [lovable/SCREENSHOTS.md](lovable/SCREENSHOTS.md). |
 
 ## The five stages
 

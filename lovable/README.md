@@ -20,6 +20,7 @@ The model reads the enquiry and writes the words: which menu items, how many gue
 | `edge-function-read-enquiry.ts` | A reference version of the server function that calls the model. Paste it if Lovable's own version drifts |
 | `schema.sql` | The database tables, stage by stage, with Huda's price list and the stage 4 security rules. Use it to check or repair what Lovable built |
 | `checks.md` | The five test cases every version must pass, as a checklist |
+| `SCREENSHOTS.md` | The build in Lovable so far, with screenshots and what differs from the prompts |
 
 ## Huda's menu
 
